@@ -12,7 +12,7 @@ This repository is example Ruby code for using the BandTools REST API. Keep it r
 
 ## Code Style
 
-- Support Ruby 3.1 and newer.
+- Support Ruby 3.4 and newer.
 - Prefer explicit, dependency-light code using Ruby standard library APIs where practical.
 - Keep resource methods small and named after BandTools API resources using Ruby idioms.
 - Centralise HTTP behaviour, authentication, response parsing, multipart encoding, and error handling in `lib/bandtools/transport.rb`.

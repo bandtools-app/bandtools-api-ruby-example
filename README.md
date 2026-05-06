@@ -6,7 +6,7 @@ This is example code rather than an official SDK. The [BandTools API reference](
 
 ## Installation
 
-Use Ruby 3.1 or newer.
+Use Ruby 3.4 or newer.
 
 ```bash
 bundle install

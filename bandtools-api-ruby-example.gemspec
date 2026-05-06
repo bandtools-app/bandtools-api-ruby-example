@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.description = 'Example Ruby code for authenticating with and using the BandTools REST API.'
   spec.homepage = 'https://bandtools.app/help/api'
   spec.license = 'MIT'
-  spec.required_ruby_version = '>= 3.1'
+  spec.required_ruby_version = '>= 3.4'
 
   spec.metadata['rubygems_mfa_required'] = 'true'
 
