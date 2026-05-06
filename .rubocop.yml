@@ -1,0 +1,32 @@
+plugins:
+  - rubocop-minitest
+
+AllCops:
+  NewCops: enable
+  SuggestExtensions: false
+  TargetRubyVersion: 3.1
+
+Layout/LineLength:
+  Max: 100
+
+Metrics/MethodLength:
+  Max: 22
+
+Style/Documentation:
+  Enabled: false
+
+Metrics/AbcSize:
+  Max: 18
+  Exclude:
+    - test/**/*_test.rb
+
+Metrics/ClassLength:
+  Max: 125
+  Exclude:
+    - test/**/*_test.rb
+
+Metrics/ParameterLists:
+  Max: 6
+
+Minitest/MultipleAssertions:
+  Enabled: false
