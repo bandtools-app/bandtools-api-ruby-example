@@ -17,11 +17,15 @@ The client itself uses only the Ruby standard library. The development dependenc
 ## Usage
 
 Create a client with a BandTools API token. In a real integration, load the token from your environment or secret manager rather than hard-coding it.
+The API endpoint can also be passed in; this example uses `BANDTOOLS_API_URL` when present and falls back to the production API URL.
 
 ```ruby
 require "bandtools"
 
-client = BandTools::Client.new(api_token: ENV.fetch("BANDTOOLS_API_TOKEN"))
+client = BandTools::Client.new(
+  api_token: ENV.fetch("BANDTOOLS_API_TOKEN"),
+  base_url: ENV.fetch("BANDTOOLS_API_URL", BandTools::Client::DEFAULT_BASE_URL)
+)
 ```
 
 The client is organised by resource area:

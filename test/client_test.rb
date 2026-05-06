@@ -78,6 +78,16 @@ class BandToolsClientTest < Minitest::Test
     FakeHTTP.requests.last
   end
 
+  def test_default_base_url_uses_production_api
+    client = BandTools::Client.new(api_token: 'test-token')
+    client.transport.http_client = FakeHTTP
+
+    client.account.get
+
+    assert_equal(['bandtools.app', 443, true], FakeHTTP.uris.last)
+    assert_equal('/api/v1/account', last_request.path)
+  end
+
   def test_get_request_adds_auth_headers_and_query_params
     result = client.subscribers.list(page: 2, per_page: 50, sort: 'email_desc')
 
