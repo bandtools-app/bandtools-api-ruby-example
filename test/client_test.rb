@@ -98,6 +98,28 @@ class BandToolsClientTest < Minitest::Test
     assert_equal('application/json', last_request['Accept'])
   end
 
+  def test_account_response_includes_plan_features
+    response = FakeHTTPSuccess.new(
+      body: JSON.generate(
+        data: {
+          id: 'acct_123',
+          features: {
+            automatic_newsletters: true,
+            duplicate_newsletter: true,
+            subscriber_limit: 1000,
+            unlimited_newsletters: true
+          }
+        }
+      )
+    )
+
+    result = client(response).account.get
+
+    assert(result.dig('data', 'features', 'automatic_newsletters'))
+    assert_equal(1000, result.dig('data', 'features', 'subscriber_limit'))
+    assert_equal('/api/v1/account', last_request.path)
+  end
+
   def test_json_request_encodes_body
     response = FakeHTTPSuccess.new(code: '201', body: '{"data":{"id":"sub_123"}}')
     result = client(response).subscribers.add('fan@example.com')

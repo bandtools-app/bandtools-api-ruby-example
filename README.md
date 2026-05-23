@@ -82,6 +82,7 @@ Read and update account, app, newsletter, theme, page design, and confirmation e
 ```ruby
 account = client.account.get
 puts account
+puts account.dig("data", "features", "subscriber_limit")
 
 client.account.update(
   {
