@@ -6,6 +6,17 @@ module BandTools
   module Resources
     class Account
       PAGES = %w[archive subscribe confirmation unsubscribe].freeze
+      SOCIAL_PLATFORMS = %w[
+        bandcamp
+        bluesky
+        facebook
+        instagram
+        soundcloud
+        spotify
+        tiktok
+        x
+        youtube
+      ].freeze
 
       def initialize(transport)
         @transport = transport
@@ -14,6 +25,11 @@ module BandTools
       def get = @transport.request_json('GET', '/account')
 
       def update(data) = @transport.request_json('PATCH', '/account', json_body: data)
+
+      def update_social_links(links)
+        validate_social_links!(links)
+        update(account: { social_links: links })
+      end
 
       def download_picture = @transport.request_bytes('GET', '/account/picture')
 
@@ -88,6 +104,13 @@ module BandTools
         return slug if PAGES.include?(slug)
 
         raise ArgumentError, "page must be one of: #{PAGES.join(', ')}"
+      end
+
+      def validate_social_links!(links)
+        unsupported = links.keys.map(&:to_s) - SOCIAL_PLATFORMS
+        return if unsupported.empty?
+
+        raise ArgumentError, "social link platform must be one of: #{SOCIAL_PLATFORMS.join(', ')}"
       end
     end
   end

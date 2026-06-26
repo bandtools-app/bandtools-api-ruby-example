@@ -103,6 +103,10 @@ class BandToolsClientTest < Minitest::Test
       body: JSON.generate(
         data: {
           id: 'acct_123',
+          social_links: {
+            bandcamp: 'https://testuser.bandcamp.com',
+            instagram: 'https://instagram.com/testuser'
+          },
           features: {
             automatic_newsletters: true,
             duplicate_newsletter: true,
@@ -117,6 +121,7 @@ class BandToolsClientTest < Minitest::Test
 
     assert(result.dig('data', 'features', 'automatic_newsletters'))
     assert_equal(1000, result.dig('data', 'features', 'subscriber_limit'))
+    assert_equal('https://testuser.bandcamp.com', result.dig('data', 'social_links', 'bandcamp'))
     assert_equal('/api/v1/account', last_request.path)
   end
 
@@ -191,6 +196,37 @@ class BandToolsClientTest < Minitest::Test
     assert_instance_of(Net::HTTP::Post, last_request)
     assert_equal('/api/v1/newsletters/nws_123/schedule', last_request.path)
     assert_equal({ 'scheduled_for' => '2026-06-01T10:00:00Z' }, JSON.parse(last_request.body))
+  end
+
+  def test_update_social_links_uses_account_request_field
+    client.account.update_social_links(
+      bandcamp: 'https://testuser.bandcamp.com',
+      instagram: 'https://instagram.com/testuser',
+      youtube: nil
+    )
+
+    assert_instance_of(Net::HTTP::Patch, last_request)
+    assert_equal('/api/v1/account', last_request.path)
+    assert_equal(
+      {
+        'account' => {
+          'social_links' => {
+            'bandcamp' => 'https://testuser.bandcamp.com',
+            'instagram' => 'https://instagram.com/testuser',
+            'youtube' => nil
+          }
+        }
+      },
+      JSON.parse(last_request.body)
+    )
+  end
+
+  def test_update_social_links_rejects_unrecognised_platforms_before_request
+    assert_raises(ArgumentError) do
+      client.account.update_social_links(myspace: 'https://example.com/testuser')
+    end
+
+    assert_empty(FakeHTTP.requests)
   end
 
   def test_api_error_uses_error_message_from_json_response

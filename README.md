@@ -88,16 +88,28 @@ client.account.update(
   {
     account: {
       name: "Example Band",
-      website_url: "https://example.com"
+      website_url: "https://example.com",
+      social_links: {
+        bandcamp: "https://exampleband.bandcamp.com",
+        instagram: "https://instagram.com/exampleband",
+        spotify: "https://open.spotify.com/artist/example"
+      }
     }
   }
+)
+
+client.account.update_social_links(
+  bandcamp: "https://exampleband.bandcamp.com",
+  instagram: "https://instagram.com/exampleband",
+  youtube: nil
 )
 
 client.account.update_newsletter_settings(
   {
     newsletter_settings: {
       newsletter_name: "Example Band Updates",
-      newsletter_description: "News, tour dates, and releases."
+      newsletter_description: "News, tour dates, and releases.",
+      display_social_links_in_footer: true
     }
   }
 )
