@@ -1,5 +1,7 @@
 # BandTools API Ruby Example
 
+[![CI](https://github.com/bandtools-app/bandtools-api-ruby-example/actions/workflows/ci.yml/badge.svg)](https://github.com/bandtools-app/bandtools-api-ruby-example/actions/workflows/ci.yml)
+
 This repository contains example Ruby code for authenticating with and using the BandTools REST API.
 It is intended as a practical starting point for developers who want to build their own integrations with BandTools.
 This is example code rather than an official SDK. The [BandTools API reference](https://bandtools.app/help/api) remains the source of truth for supported endpoints, request formats, and response formats.
