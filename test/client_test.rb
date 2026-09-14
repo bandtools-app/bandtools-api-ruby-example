@@ -190,6 +190,19 @@ class BandToolsClientTest < Minitest::Test
     end
   end
 
+  def test_attachment_upload_allows_an_explicit_content_type_override
+    response = FakeHTTPSuccess.new(code: '201', body: '{"data":{"id":"att_123"}}')
+    Tempfile.create(['track', '.bin']) do |file|
+      file.binmode
+      file.write('audio-bytes')
+      file.close
+
+      client(response).newsletters.upload_attachment(file.path, content_type: 'audio/mp4')
+
+      assert_includes(last_request.body, 'Content-Type: audio/mp4')
+    end
+  end
+
   def test_newsletter_updates_pass_collaborator_lock_versions
     client.newsletters.update('nws_123', { subject: 'Updated subject', lock_version: 7 })
 
