@@ -182,6 +182,20 @@ client.newsletters.remove_from_archive(newsletter_id)
 client.newsletters.delete(copy_id)
 ```
 
+When updating a shared draft as a collaborator, first load the newsletter and
+include its current `lock_version`. Owners may omit this field.
+
+```ruby
+latest = client.newsletters.get(newsletter_id)
+client.newsletters.update(
+  newsletter_id,
+  {
+    message: "<p>Updated by a collaborator.</p>",
+    lock_version: latest.dig("data", "lock_version")
+  }
+)
+```
+
 A previously sent newsletter can also be sent only to subscribers who joined after the original send.
 
 ```ruby
@@ -204,8 +218,14 @@ client.newsletters.release_lock(newsletter_id)
 
 Uploads accept filesystem paths.
 
+Newsletter attachments can be PDF, JPEG, PNG, GIF, WebP, MP3, MP4, or MPEG
+video files up to 20 MiB. The content type is inferred from the filename; pass
+`content_type:` when the filename does not identify it or when uploading MP4
+audio.
+
 ```ruby
 attachment = client.newsletters.upload_attachment("poster.jpg")
+audio = client.newsletters.upload_attachment("track.bin", content_type: "audio/mp4")
 puts attachment
 
 client.account.upload_picture("profile.png")

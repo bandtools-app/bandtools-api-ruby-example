@@ -106,8 +106,8 @@ module BandTools
 
       def shared = @transport.request_json('GET', '/shared-newsletters')
 
-      def upload_attachment(file_path)
-        upload = Transport::FileUpload.new('file', file_path, nil)
+      def upload_attachment(file_path, content_type: nil)
+        upload = Transport::FileUpload.new('file', file_path, content_type)
         @transport.request_json('POST', '/newsletters/attachments', file_upload: upload)
       end
     end

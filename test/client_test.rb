@@ -162,8 +162,43 @@ class BandToolsClientTest < Minitest::Test
       assert_instance_of(Net::HTTP::Post, last_request)
       assert_includes(last_request['Content-Type'], 'multipart/form-data; boundary=')
       assert_includes(last_request.body, 'name="file"; filename="cover')
+      assert_includes(last_request.body, 'Content-Type: image/jpeg')
       assert_includes(last_request.body, 'image-bytes')
     end
+  end
+
+  def test_attachment_uploads_use_api_supported_content_types
+    response = FakeHTTPSuccess.new(code: '201', body: '{"data":{"id":"att_123"}}')
+    content_types = {
+      '.pdf' => 'application/pdf',
+      '.m4a' => 'audio/mp4',
+      '.mp3' => 'audio/mpeg',
+      '.mp4' => 'video/mp4',
+      '.mpeg' => 'video/mpeg'
+    }
+
+    content_types.each do |extension, content_type|
+      Tempfile.create(['attachment', extension]) do |file|
+        file.binmode
+        file.write('attachment-bytes')
+        file.close
+
+        client(response).newsletters.upload_attachment(file.path)
+
+        assert_includes(last_request.body, "Content-Type: #{content_type}")
+      end
+    end
+  end
+
+  def test_newsletter_updates_pass_collaborator_lock_versions
+    client.newsletters.update('nws_123', { subject: 'Updated subject', lock_version: 7 })
+
+    assert_instance_of(Net::HTTP::Patch, last_request)
+    assert_equal('/api/v1/newsletters/nws_123', last_request.path)
+    assert_equal(
+      { 'subject' => 'Updated subject', 'lock_version' => 7 },
+      JSON.parse(last_request.body)
+    )
   end
 
   def test_newsletter_archive_and_duplicate_operations_use_schema_paths
