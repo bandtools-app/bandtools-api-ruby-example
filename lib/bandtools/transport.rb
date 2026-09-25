@@ -30,15 +30,16 @@ module BandTools
 
     FileUpload = Struct.new(:field_name, :path, :content_type, keyword_init: false)
 
-    attr_reader :api_token, :base_url, :timeout
+    attr_reader :api_token, :base_url, :timeout, :upload_timeout
     attr_accessor :http_client
 
-    def initialize(api_token:, base_url:, timeout:)
+    def initialize(api_token:, base_url:, timeout:, upload_timeout: 120)
       raise ArgumentError, 'api_token is required' if api_token.to_s.empty?
 
       @api_token = api_token
       @base_url = base_url.delete_suffix('/')
       @timeout = timeout
+      @upload_timeout = upload_timeout
       @http_client = Net::HTTP
     end
 
@@ -66,7 +67,8 @@ module BandTools
     def request(method, path, query: nil, json_body: nil, file_upload: nil, expect_binary: false)
       uri = build_uri(path, query)
       http_request = build_request(method, uri, json_body:, file_upload:)
-      response = perform_request(uri, http_request)
+      request_timeout = file_upload.nil? ? timeout : upload_timeout
+      response = perform_request(uri, http_request, request_timeout:)
 
       return nil if response.code.to_i == 204 || response.body.to_s.empty?
       return response.body if expect_binary
@@ -123,10 +125,10 @@ module BandTools
       MIME_TYPES.fetch(path.extname.downcase, 'application/octet-stream')
     end
 
-    def perform_request(uri, http_request)
+    def perform_request(uri, http_request, request_timeout:)
       http_client.start(uri.hostname, uri.port, use_ssl: uri.scheme == 'https') do |http|
-        http.read_timeout = timeout
-        http.open_timeout = timeout
+        http.read_timeout = request_timeout
+        http.open_timeout = request_timeout
         response = http.request(http_request)
         raise_api_error(response) unless response.code.to_i.between?(200, 299)
 

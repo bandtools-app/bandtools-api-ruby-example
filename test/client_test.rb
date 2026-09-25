@@ -29,7 +29,7 @@ class FakeHTTPError < FakeHTTPResponse; end
 
 class FakeHTTP
   class << self
-    attr_accessor :response, :requests, :uris
+    attr_accessor :last_open_timeout, :last_read_timeout, :response, :requests, :uris
 
     def start(hostname, port, use_ssl:)
       http = new(hostname, port, use_ssl)
@@ -46,6 +46,8 @@ class FakeHTTP
   end
 
   def request(request)
+    self.class.last_open_timeout = open_timeout
+    self.class.last_read_timeout = read_timeout
     self.class.requests << request
     self.class.uris << [@hostname, @port, @use_ssl]
 
@@ -61,6 +63,8 @@ class BandToolsClientTest < Minitest::Test
     FakeHTTP.response = FakeHTTPSuccess.new
     FakeHTTP.requests = []
     FakeHTTP.uris = []
+    FakeHTTP.last_open_timeout = nil
+    FakeHTTP.last_read_timeout = nil
   end
 
   def client(response = nil)
@@ -164,6 +168,7 @@ class BandToolsClientTest < Minitest::Test
       assert_includes(last_request.body, 'name="file"; filename="cover')
       assert_includes(last_request.body, 'Content-Type: image/jpeg')
       assert_includes(last_request.body, 'image-bytes')
+      assert_equal(120, FakeHTTP.last_read_timeout)
     end
   end
 

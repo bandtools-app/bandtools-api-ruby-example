@@ -13,8 +13,8 @@ module BandTools
 
     attr_reader :account, :automatic_newsletters, :newsletters, :subscribers, :webhooks, :transport
 
-    def initialize(api_token:, base_url: DEFAULT_BASE_URL, timeout: 30)
-      @transport = Transport.new(api_token:, base_url:, timeout:)
+    def initialize(api_token:, base_url: DEFAULT_BASE_URL, timeout: 30, upload_timeout: 120)
+      @transport = Transport.new(api_token:, base_url:, timeout:, upload_timeout:)
       @subscribers = Resources::Subscribers.new(@transport)
       @account = Resources::Account.new(@transport)
       @newsletters = Resources::Newsletters.new(@transport)
